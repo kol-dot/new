@@ -78,6 +78,20 @@ def preprocess_image(image):
     image = np.expand_dims(image, axis=0)  # Add batch dimension
     return image
 
+# Evaluate the model on the test set
+def evaluate_model(model):
+    test_datagen = ImageDataGenerator(rescale=1./255)
+    test_generator = test_datagen.flow_from_directory(
+        test_dir,
+        target_size=(img_height, img_width),
+        batch_size=batch_size,
+        class_mode='categorical'
+    )
+    
+    # Evaluate the model
+    test_loss, test_accuracy = model.evaluate(test_generator)
+    return test_loss, test_accuracy
+
 # Retrain the model
 def retrain_model():
     # Update and overwrite class names before retraining
@@ -140,6 +154,10 @@ def retrain_model():
 
     # Save the retrained model
     model.save('staff_mobilenet_v2_model.h5')
+    
+    # Evaluate the model
+    test_loss, test_accuracy = evaluate_model(model)
+    return test_loss, test_accuracy
 
 # Streamlit app layout
 st.title("Staff Image Recognition")
@@ -165,7 +183,11 @@ if uploaded_image is not None and class_name:
     save_images(augmented_images, class_name)
 
     # Retrain the model
-    retrain_model()
+    test_loss, test_accuracy = retrain_model()
+    
+    # Display evaluation results
+    st.write(f"Test Loss: {test_loss:.4f}")
+    st.write(f"Test Accuracy: {test_accuracy:.4f}")
 
     # Load the updated model for prediction
     model = tf.keras.models.load_model('staff_mobilenet_v2_model.h5')
