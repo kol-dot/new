@@ -150,7 +150,6 @@ if uploaded_image is not None and class_name:
         class_names = json.load(f)
     predicted_class = list(class_names.keys())[predicted_class_index]
     st.write(f"Prediction: {predicted_class} with probability {np.max(predictions):.2f}")
-
-# Debugging information
-st.write(f"Image shape: {image.size}")
-st.write(f"Processed image shape: {processed_image.shape}")
+    # Debugging information
+    st.write(f"Image shape: {image.size}")
+    st.write(f"Processed image shape: {processed_image.shape}")
